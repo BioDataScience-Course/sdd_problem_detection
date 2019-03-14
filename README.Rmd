@@ -1,0 +1,28 @@
+---
+title: "Outils de détection des difficultés des étudiants dans l'utilisation de quiz interactifs (package leanr)"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F, message = F)
+SciViews::R
+# Import dataset
+sdd_dt <- data.io::read("data/sdd_wrangling.rds")
+```
+
+Cette application shiny a pour objectif de proposer un outil de détection des difficultés des étudiants.
+
+```{r}
+ord <- rev(levels(sdd_dt$tutorial))
+```
+
+Les étudiants réalisent des quiz interactifs via le package `learnr`. L'ensemble des questions composant les quiz renvoie des informations dans une base de données que nous souhaitons analyser via une application shiny. 
+
+```{r}
+chart(data = sdd_dt, fct_relevel(tutorial, ord) ~ date %fill=% tutorial) +
+  ggridges::geom_density_ridges(show.legend = F) +
+  labs( x = "Temps", y = "Quiz")
+```
+
+Nous observons deux types de graphique de densité avec un pic concentré pour les quiz tels sdd1.02 a, sdd1.03a ou bien des graphes de densité plus étendue comme sdd1.05a ou encore sdd1.06 a. Que cachent ces deux types de graphiques de densités ? Les étudiants ont-ils éprouvé une difficulté particulière ? La shiny App a pour objectif de répondre à cette question via divers graphiques.
+
