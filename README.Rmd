@@ -8,13 +8,17 @@ knitr::opts_chunk$set(echo = F,warning = F, message = F)
 SciViews::R
 # Import dataset
 sdd_dt <- data.io::read("data/sdd_wrangling.rds")
-```
-
-Cette application shiny a pour objectif de proposer un outil de détection des difficultés des étudiants.
-
-```{r}
 ord <- rev(levels(sdd_dt$tutorial))
 ```
+
+# Auteurs
+
+- [Guyliann Engels](https://github.com/GuyliannEngels)
+- [Philippe Grosjean](https://github.com/phgrosjean)
+
+# Résumé
+
+Cette application shiny a pour objectif de proposer un outil de détection des difficultés des étudiants.
 
 Les étudiants réalisent des quiz interactifs via le package `learnr`. L'ensemble des questions composant les quiz renvoie des informations dans une base de données que nous souhaitons analyser via une application shiny. 
 
