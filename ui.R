@@ -6,7 +6,7 @@ SciViews::R
 shinyUI(
   navbarPage(
     "Tableau de bord",
-    theme = shinytheme("flatly"),
+    theme = shinytheme("united"),
     tabPanel("Description générale",
              sidebarLayout(
                sidebarPanel(

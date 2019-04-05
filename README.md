@@ -16,4 +16,6 @@ Les étudiants réalisent des quiz interactifs via le package `learnr`. L'ensemb
 
 ![](README_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
-Nous observons deux types de graphique de densité avec un pic concentré pour les quiz tels sdd1.02 a, sdd1.03a ou bien des graphes de densité plus étendue comme sdd1.05a ou encore sdd1.06 a. Que cachent ces deux types de graphiques de densités ? Les étudiants ont-ils éprouvé une difficulté particulière ? La shiny App a pour objectif de répondre à cette question via divers graphiques.
+Nous observons deux types de graphique de densité avec un pic concentré pour les quiz tels sdd1.02 a, sdd1.03a ou bien des graphes de densité plus étendue comme sdd1.05a ou encore sdd1.06 a. Que cachent ces deux types de graphiques de densités ? Les étudiants ont-ils éprouvé une difficulté particulière ?
+
+La shiny App a pour objectif de répondre à cette question via divers graphiques.
