@@ -59,7 +59,7 @@ Le tableur est divisé en 12 colonnes :
 
 ### Onglet graphique
 
-Le premier onglet "Plot", permet la visualisation sous forme de graphique de la croissance du corail. ![Onglet graphique](../image/notebook-plot1.png)
+Le premier onglet "Plot", permet la visualisation sous forme de graphique de la croissance du corail. ![Onglet graphique](analysis/image/notebook-plot1.png)
 
 ### Paramètres
 
@@ -73,7 +73,7 @@ On peut filtrer sur différents paramètres :
 -   Xvar
 -   période de temps
 
-![Paramètres filtrables](../image/notebook-plot2.png) Les 3 premiers paramètres **project**, **condition**, **status** peuvent être sélectionné depuis un menu déroulant, pour supprimer une valeur il suffit de cliquer sur la valeur et d'appuyer sur la touche *SUPPR*.
+![Paramètres filtrables](analysis/image/notebook-plot2.png) Les 3 premiers paramètres **project**, **condition**, **status** peuvent être sélectionné depuis un menu déroulant, pour supprimer une valeur il suffit de cliquer sur la valeur et d'appuyer sur la touche *SUPPR*.
 
 Le choix des **ID** se fait via un menu déroulant qui permet de les sélectionner un par un ou de tout sélectionner/désélectionner.
 
@@ -96,7 +96,7 @@ En bas du graphique des informations supplémentaires sont données : + Yvar : l
 
 ### Onglet tableau de donnée
 
-Le deuxième onglet "Data table", permet de visualiser le tableau de donnée, certaines colonnes ont été calculées. On peut le trier en fonction de chacune des colonnes.<br/><br/> ![Paramètres filtrables](../image/notebook-table1.png) <br/><br/>
+Le deuxième onglet "Data table", permet de visualiser le tableau de donnée, certaines colonnes ont été calculées. On peut le trier en fonction de chacune des colonnes.<br/><br/> ![Paramètres filtrables](analysis/image/notebook-table1.png) <br/><br/>
 
 IT
 --
@@ -120,9 +120,9 @@ server.R
 
 ### Importation
 
-L'adresse URL est contenue dans la variable coral\_url. L'URL est générée via un fichier en ligne Google sheets. <br/> <br/> ![Feuille Google Sheets](../image/notebook-googlesheets0.png) <br/><br/>
+L'adresse URL est contenue dans la variable coral\_url. L'URL est générée via un fichier en ligne Google sheets. <br/> <br/> ![Feuille Google Sheets](analysis/image/notebook-googlesheets0.png) <br/><br/>
 
-Pour cela il faut aller dans *Fichier &gt; Publier sur le web*, puis choisir : *Intégrer &gt; Valeurs séparées par des virgules (.csv)*. <br/><br/> ![Chemin d'accès des options de publication](../image/notebook-googlesheets1.png) <br/> \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ <br/> ![Format du fichier partagé](../image/notebook-googlesheets2.png)
+Pour cela il faut aller dans *Fichier &gt; Publier sur le web*, puis choisir : *Intégrer &gt; Valeurs séparées par des virgules (.csv)*. <br/><br/> ![Chemin d'accès des options de publication](analysis/image/notebook-googlesheets1.png) <br/> \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ <br/> ![Format du fichier partagé](analysis/image/notebook-googlesheets2.png)
 
 Le lien de partage au format csv contenu dans *coral\_url* sera lu par la fonction *read\_csv*. Cette fonction va importer le tableau de donnée et les mettre au bon format. Une grande source d'erreur provient de l'importation, il est important de respecter le nom des colonnes, ne pas jouer avec le format des colonnes, surtout pour la date qui devient facilement un problème. <br/> Dans le tableau de donnée de base, la plupart des colonnes ont le format "texte brute", seuls les colonnes "id", "weight", "temperature" et "salinity" ont un format numérique.
 
