@@ -1,5 +1,5 @@
 ---
-title: "Outils de détection des difficultés des étudiants dans l'utilisation de quiz interactifs (package leanr)"
+title: "Outils de détection des difficultés des étudiants dans l'utilisation de quiz interactifs (package learnr)"
 output: github_document
 ---
 
