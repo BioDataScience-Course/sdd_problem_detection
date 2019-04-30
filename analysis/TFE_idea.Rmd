@@ -1,0 +1,63 @@
+---
+title: "Présentation des idées du TFE"
+author: "Benrezkallah Jordan"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+```{r setup, echo = FALSE, warning=FALSE, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+SciViews::R
+library(data.table)
+library(forcats)
+library(flow)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+
+sdd_dt <- data.io::read("../data/sdd_wrangling.rds", type = "rds")
+
+```
+
+## Introduction
+
+Le TFE  "**_Estimation de la difficulté d’un questionnaire à l’aide d’outils statistiques en ligne_**"" consiste à élaborer des graphiques représentant la difficulté des étudiants qui ont répondu aux différents questionnaires.
+
+
+
+
+## Idées
+
+### Histogramme : Fréquence d'essais nécessaire
+
+La représentation graphique doit montrer le nombre d'essais nécessaire par étudiant afin de valider une question.
+
+Dans cette exemple, c'est sur la question "sdd1.02a_assig1" qu'est créé l'histogramme.
+Dans l'application Shiny on pourra choisir sur quelle question on souhaite obtenir un graphique.
+
+/!\\ En abscisse, entre 6 et 11, il n'y a aucune donnée. 
+Faut-il ajouté des valeurs nulles ?
+/!\\
+
+```{r}
+
+sdd_dt %>.%
+  group_by(., tuto_label, user_name ) %>.%
+  summarise(., count = n() ) %>.%
+  filter(., tuto_label == "sdd1.02a_assig1") %>.%
+  arrange(., user_name) -> df
+
+df <- as.data.frame(table(df$count)) %>.%
+  mutate(., pct = ( Freq/sum(Freq) )*100, pct = as.integer(pct) ) -> df
+
+ggplot(df, aes(x = Var1, y = pct, fill = Var1 )) +
+  geom_col(show.legend = F) +
+  scale_x_discrete(limits = df$Nbr_essai) +
+  xlab("Nombre d'essais") +
+  ylab("Pourcentage d'étudiant")
+```
+
