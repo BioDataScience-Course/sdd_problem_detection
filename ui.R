@@ -68,13 +68,17 @@ shinyUI(
       tabPanel("Jordan",
                sidebarLayout(
                  sidebarPanel(
-                   selectInput("tuto_lab", "Sélectionnez la question souhaitée ci-dessous",
+                   selectInput("tuto_lab", "Select the desired question below",
                                choices = unique(sdd_dt$tuto_label),
                                selected = unique(sdd_dt$tuto_label)[1],
-                               selectize = F)
+                               selectize = F),
+                   radioButtons("ui_quiz_unit", "Unit :",
+                                choices = c("percentage (%)", "number of students"),
+                                selected = "percentage (%)")
                  ),
                  mainPanel(
                    plotlyOutput("plot1"),
+                   br(),
                    DTOutput(outputId = "u_table")
                  )
                ))

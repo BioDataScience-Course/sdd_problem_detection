@@ -37,9 +37,10 @@ function(input, output) {
   }, deleteFile = FALSE)
 
   output$tab_mod <- renderDataTable({
-    datatable(table_nbr_question, colnames = c("Quiz", "Etudiants", "Nombre d'entrées",
-                              "Nombre de questions par quiz"),
-              rownames = FALSE, options = list(pageLength = 5))
+    datatable(table_nbr_question,
+              colnames = c("Quiz", "Etudiants", "Nombre d'entrées",
+                           "Nombre de questions par quiz"),
+              rownames = FALSE, options = list(dom = "ltip", pageLength = 5))
       })
 
   output$bar_plot <- renderPlot({
@@ -117,50 +118,62 @@ function(input, output) {
 
   output$plot1 <- renderPlotly({
     sdd_dt %>.%
-      filter(., tuto_label == input$tuto_lab) %>.%
+      filter(.,
+
+             tuto_label == input$tuto_lab) %>.%
       group_by(., tuto_label, user_name ) %>.%
       summarise(., count = n() ) %>.%
       arrange(., user_name) -> df
 
-      # as.data.frame(table(df$count)) %>.%
-      # mutate(., pct = ( Freq/sum(Freq) )*100, pct = as.integer(pct) ) -> df
-
-      # ggplot(df, aes(x = Var1, y = pct, fill = Var1 )) +
-      #   geom_col(show.legend = F) +
-      #   scale_x_discrete(limits = df$Nbr_essai) +
-      #   xlab("Nombre d'essais") +
-      #   ylab("Pourcentage d'étudiant") -> p
-      # ggplotly(p,  showlegend = FALSE )
-      #
-
-
       df <- as.data.frame(table(df$count)) %>.%
-        mutate(., pct = ( Freq/sum(Freq) )*100, pct = as.integer(pct),
+        mutate(., pct = (Freq/sum(Freq) )*100, pct = as.integer(pct),
                count = Var1) -> df
 
+      # Choix de l'unité
+      yvar = df$pct
+      if ("percentage (%)" %in% input$ui_quiz_unit) {
+        yvar = df$pct
+        y_axis_name = "Percentage"
+        info_tooltip = paste(df$pct, "%", sep = "")
+      }
+      if ("number of students" %in% input$ui_quiz_unit) {
+        yvar = df$Freq
+        y_axis_name = "Number of students"
+        info_tooltip = df$Freq
+      }
 
-
-      p <- plot_ly(data = df, x = df$Var1, y = df$pct, type = "bar", text = df$pct)
-      p <- layout(p, showlegend = FALSE)
+      plot_ly(data = df, x = df$Var1, y = yvar,
+                   type = "bar", text = info_tooltip,
+                   hoverinfo = "text") %>.%
+        layout(., showlegend = FALSE,
+                  xaxis = list(title = "Attempt"),
+                  yaxis = list(title = y_axis_name)) %>.%
+        config(., displayModeBar = F)
   })
 
   output$u_table <- renderDT({
-      sdd_dt %>.%
+    sdd_dt %>.%
       filter(., tuto_label == input$tuto_lab) %>.%
       group_by(., tuto_label, user_name ) %>.%
       summarise(., count = n() ) %>.%
       arrange(., user_name)  %>.%
       ungroup(.) %>.%
       mutate(., Var1 = as.factor(count)) %>.%
-      select(., user_name, count) -> df
+      dplyr::select(., user_name, count) -> df
 
+    #Permet de faire un spread :
+    #Voir : https://github.com/tidyverse/tidyr/issues/426
     df %>%
       group_by_at(vars(-user_name)) %>%
-      mutate(row_id=1:n()) %>% ungroup() %>%
+      mutate(row_id = 1:n()) %>% ungroup() %>%
       spread(count,user_name) %>%
-      select(-row_id) -> df
+      dplyr::select(-row_id) -> df
 
-    datatable(df)
+    datatable(df, options = list( dom = "t",
+                                  initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+      "}")))
   })
 
 }
