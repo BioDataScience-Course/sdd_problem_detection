@@ -2,7 +2,7 @@
 
 SciViews::R
 
-sdd_dt <- read("data/sdd.rds", type = "rds")
+sdd_dt <- read("data/sdd_comp.rds", type = "rds")
 
 # wrangling
 learnrs <- tribble(
@@ -52,4 +52,4 @@ sdd_dt$event <- factor(sdd_dt$event,
                        labels = c("questions ouvertes", "commentaires",
                                   "vidéo", "quiz"))
 
-write(sdd_dt, file = "Data/sdd_wrangling.rds", type = "rds", compress = "xz")
+write(sdd_dt, file = "data/sdd_wrangling.rds", type = "rds", compress = "xz")

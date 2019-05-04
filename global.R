@@ -12,10 +12,10 @@ library(plotly)
 SciViews::R
 
 # Import dataset -----------
-sdd_dt <- data.io::read("sdd_wrangling.rds", type = "rds")
+sdd_dt <- data.io::read("data/sdd_wrangling.rds", type = "rds")
 
 
-ord <- rev(levels(sdd_dt$tutorial))
+ord <- rev(levels(as.factor(sdd_dt$tutorial)))
 sdd_dt %>.%
   filter(., label != "commentaires") %>.%
   group_by(., name) %>.%
