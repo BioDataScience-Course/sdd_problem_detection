@@ -14,7 +14,7 @@ df %>%
   group_by_at(vars(-user_name)) %>%
   mutate(row_id=1:n()) %>% ungroup() %>%
   spread(count,user_name) %>%
-  dplyr::select(-row_id) -> df
+  dplyr::select(-row_id) -> df_spread
 
 
 #

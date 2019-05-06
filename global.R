@@ -38,3 +38,4 @@ ttt <- mutate(ttt, score = res/tot,
               quiz = str_extract(name, pattern = "\\w{3}"))
 
 test <- rev(paste("student_", 1:40, sep = ""))
+

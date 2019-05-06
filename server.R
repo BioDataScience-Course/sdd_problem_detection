@@ -119,7 +119,6 @@ function(input, output) {
   output$plot1 <- renderPlotly({
     sdd_dt %>.%
       filter(.,
-
              tuto_label == input$tuto_lab) %>.%
       group_by(., tuto_label, user_name ) %>.%
       summarise(., count = n() ) %>.%
@@ -151,7 +150,11 @@ function(input, output) {
         config(., displayModeBar = F)
   })
 
-  output$u_table <- renderDT({
+  output$u_quiz_table1 <- renderDT({
+
+    # Sous-onglet 1
+
+    # Création colonne "count" = nombre de tentative
     sdd_dt %>.%
       filter(., tuto_label == input$tuto_lab) %>.%
       group_by(., tuto_label, user_name ) %>.%
@@ -159,21 +162,63 @@ function(input, output) {
       arrange(., user_name)  %>.%
       ungroup(.) %>.%
       mutate(., Var1 = as.factor(count)) %>.%
-      dplyr::select(., user_name, count) -> df
+      dplyr::select(., user_name, count) -> df_count
 
-    #Permet de faire un spread :
+    #Permet de faire un spread
     #Voir : https://github.com/tidyverse/tidyr/issues/426
-    df %>%
+    df_count %>%
       group_by_at(vars(-user_name)) %>%
       mutate(row_id = 1:n()) %>% ungroup() %>%
       spread(count,user_name) %>%
-      dplyr::select(-row_id) -> df
+      dplyr::select(-row_id) -> df_attempt
 
-    datatable(df, options = list( dom = "t",
-                                  initComplete = JS(
+
+    datatable(df_attempt, options = list( dom = "t",
+                                  initComplete = JS( # javascript pour modifier l'apparence
       "function(settings, json) {",
       "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
-      "}")))
+      "}"
+
+
+
+      )))
+
+
+
+
+  })
+
+  output$u_quiz_table2 <- renderDT({
+
+    # Sous-onglet 2
+    filter(sdd_dt, tuto_label == input$tuto_lab) -> sdd_dt
+
+    # Création colonne "count" = nombre de tentative
+    sdd_dt %>.%
+      group_by(., tuto_label, user_name ) %>.%
+      summarise(., count = n() ) %>.%
+      arrange(., user_name)  %>.%
+      ungroup(.) %>.%
+      mutate(., Var1 = as.factor(count)) %>.%
+      dplyr::select(., user_name, count) -> df_count
+
+
+    # Information à fusionner
+    sdd_dt %>.%
+      dplyr::select(., user_name, data, date, event) -> df_tuto_label
+
+    # Fusion
+    df_join <- merge(df_count, df_tuto_label , by = "user_name", all = TRUE)
+    df_join <- arrange(df_join, count, user_name)
+
+    datatable(df_join, options = list( dom = "ltp",
+                                       initComplete = JS(
+                                         "function(settings, json) {",
+                                         "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+                                         "}"
+                                         )
+                                       ),
+              rownames = FALSE, filter = "top" )
   })
 
 }
