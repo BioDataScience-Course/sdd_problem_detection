@@ -5,20 +5,19 @@ function(input, output) {
 
 
   output$nbr <- renderText({
-    paste("En ce", format(Sys.time(), "%d %B %Y %X"),
-          ", la base de données comprend : \n")
+    paste("On this", format(Sys.time(), "%d %B %Y %X"),
+          ", the database includes : \n")
   })
 
   output$tab_gen <- renderTable({
-    tibble::data_frame("Entrées" = nrow(sdd_dt),
+    tibble::data_frame("Submission" = nrow(sdd_dt),
                "Quiz" = length(unique(sdd_dt$tutorial)),
-               "Etudiants" = length(unique(sdd_dt$user_name)))
+               "Students" = length(unique(sdd_dt$user_name)))
   })
 
   output$tuto_nbr <- renderText({
-    paste("La base de données comprend", length(unique(sdd_dt$tutorial)),
-          "tutoriels qui sont répartis au sein des différents modules du
-           cours de la science des données I : visualisation et inférence.")
+    paste("The database includes", length(unique(sdd_dt$tutorial)),
+          "tutorials that are distributed within the different modules of the data science course I : visualization and inference.")
   })
 
   output$econum <- renderImage({
@@ -38,28 +37,27 @@ function(input, output) {
 
   output$tab_mod <- renderDataTable({
     datatable(table_nbr_question,
-              colnames = c("Quiz", "Etudiants", "Nombre d'entrées",
-                           "Nombre de questions par quiz"),
+              colnames = c("Quiz", "Students", "Number of submission",
+                           "Number of question per quiz"),
               rownames = FALSE, options = list(dom = "ltip", pageLength = 5))
       })
 
   output$bar_plot <- renderPlot({
-    if (input$nb_tuto == "Entrées en fonction du temps") {
+    if (input$nb_tuto == "Submission by time") {
       chart::chart(data = sdd_dt,
                    fct_relevel(tutorial, ord) ~ date %fill=% tutorial) +
         ggridges::geom_density_ridges(show.legend = F) +
-        labs( x = "Temps [mois]", y = "Quiz",
-                       caption = "Succession de graphes de densité des entrées
-                       au cours du temps par quiz") +
+        labs( x = "Time [month]", y = "Quiz",
+                       caption = "Succession of input density graphs over time by quiz") +
         theme( plot.caption = element_text(size = 14))
-    } else if (input$nb_tuto == "Nombre total d'essais par quiz") {
+    } else if (input$nb_tuto == "Total number of attempts per quiz") {
       chart::chart(data = sdd_dt, ~ fct_relevel(tutorial, ord) %fill=% tutorial) +
         geom_bar(show.legend = F) +
         coord_flip() +
-        labs(x = "Quiz", y = "Nombre d'essais",
-             caption = "Nombre d'essais par quiz") +
+        labs(x = "Quiz", y = "Number of attempt",
+             caption = "Number of attempts per quiz") +
         theme( plot.caption = element_text(size = 14))
-    } else if (input$nb_tuto == "Nombre d'essais standardisés") {
+    } else if (input$nb_tuto == "Number of standardized attempts") {
       sdd_dt %>.%
         group_by(., tutorial) %>.%
         summarise(., n_tot =  length(unique(label)), n = length(label),
@@ -67,20 +65,8 @@ function(input, output) {
         chart::chart(data = ., ratio ~ fct_relevel(tutorial, ord) %fill=% tutorial) +
         geom_col(show.legend = F) +
         coord_flip() +
-        labs(x = "Quiz", y = "Nombre d'essais standardisés",
-             caption = "Nombre d'essais standardisés par le nombre
-                        de questions par quiz") +
-        theme(plot.caption = element_text(size = 14))
-    } else {
-      chart(ttt, fct_relevel(user_name, test) ~ quiz %fill=% score1) +
-        geom_raster() +
-        xlab("") +
-        ylab("") +
-        geom_hline(yintercept = (0:length(levels(ttt$user_name))) + 0.5) +
-        geom_vline(xintercept = (0:length(unique(ttt$name))) + 0.5) +
-        scale_fill_distiller(palette = "RdBu", direction = 1) +
-        labs(caption = "Le score est le ratio de réponses soumises sur le nombre
-                        total de réponses par quiz", fill = "Score") +
+        labs(x = "Quiz", y = "Number of standardized",
+             caption = "Number of attempt standardized by the number of questions per quiz") +
         theme(plot.caption = element_text(size = 14))
     }
   })
@@ -90,8 +76,8 @@ function(input, output) {
       filter(., tutorial == input$tuto) %>.%
       chart::chart(., ~ label %fill=% event) +
       ggplot2::geom_bar() +
-      ggplot2::labs( x = "Questions", y = "Nombre d'essais",
-                     fill = "Evénements") +
+      ggplot2::labs( x = "Questions", y = "Number of attempts",
+                     fill = "Events") +
       ggplot2::coord_flip() +
       theme(legend.position = "top")
   })
@@ -101,7 +87,7 @@ function(input, output) {
       filter(., user_name == input$stu) %>.%
       chart::chart(data = .,fct_relevel(tutorial, ord) ~ date %fill=% tutorial) +
       ggridges::geom_density_ridges(show.legend = F) +
-      ggplot2::labs( x = "Temps [mois]", y = "Quiz")
+      ggplot2::labs( x = "Time [month]", y = "Quiz")
   })
 
   output$bar_plot_stu1 <- renderPlot({
@@ -110,8 +96,8 @@ function(input, output) {
       filter(., tutorial == input$tuto1) %>.%
       chart::chart(., ~ label %fill=% event) +
       ggplot2::geom_bar() +
-      ggplot2::labs( x = "Questions", y = "Nombre d'essais",
-                     fill = "Evénements") +
+      ggplot2::labs( x = "Questions", y = "Number of attempts",
+                     fill = "Events") +
       ggplot2::coord_flip() +
       theme(legend.position = "top")
   })
@@ -150,6 +136,53 @@ function(input, output) {
         config(., displayModeBar = F)
   })
 
+  output$plot3 <- renderPlotly({
+
+    sdd_dt %>.%
+      dplyr::select(., date, user_name, tutorial) %>.%
+      dplyr::arrange(., date) %>.%
+      group_by(., user_name, tutorial) %>.%
+      dplyr::mutate(., diff = difftime(date, date[1], units = "mins"))  %>.%
+      dplyr::filter(., diff < 20) %>.%
+      dplyr::mutate(., diff = round(diff, digits = 2)) %>.%
+      dplyr::mutate(., max_diff = max(diff)) %>.%
+      dplyr::select(., tutorial, user_name, max_diff) -> df
+
+    aggregate(df$max_diff, list(df$user_name, df$tutorial), mean) %>%
+      dplyr::rename(
+        user_name = "Group.1",
+        tutorial = "Group.2",
+        max_diff = x
+      ) -> df
+
+    plyr::ddply(df, .(tutorial), summarize, mean_overall = mean(max_diff)) -> df_mean
+
+    merge(df, df_mean,  by =  "tutorial", all.y = TRUE) %>.%
+      dplyr::filter(., user_name == input$stu) -> df
+
+    df$mean_overall <- round(df$mean_overall, digits = 2)
+
+    text1 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$max_diff, " min", sep = "")
+    text2 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$mean_overall, " min", sep = "")
+
+    plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = "student",
+            text = text1, hoverinfo = "text+name", marker = list(line = list(color = "rgb(8,48,107)",
+                                                                       width = 1.5))) %>%
+      add_trace(y = ~mean_overall, name = "average", text = text2) %>%
+      layout(., title = input$stu, showlegend = TRUE,
+             xaxis = list(title = "Tutorial"),
+             yaxis = list(title = "Time (min)")) %>.%
+      config(., displayModeBar = F)
+
+  })
+
+  output$ui_tuto_lab <- renderUI({
+    selectInput("tuto_lab2", "Select the desired questionnaire below",
+                choices = unique(sdd_dt$tuto_label),
+                selected = input$tuto_lab,
+                selectize = F)
+  })
+
   output$u_quiz_table1 <- renderDT({
 
     # Sous-onglet 1
@@ -178,20 +211,13 @@ function(input, output) {
       "function(settings, json) {",
       "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
       "}"
-
-
-
       )))
-
-
-
-
   })
 
   output$u_quiz_table2 <- renderDT({
 
     # Sous-onglet 2
-    filter(sdd_dt, tuto_label == input$tuto_lab) -> sdd_dt
+    filter(sdd_dt, tuto_label == input$tuto_lab2) -> sdd_dt
 
     # Création colonne "count" = nombre de tentative
     sdd_dt %>.%
@@ -205,7 +231,7 @@ function(input, output) {
 
     # Information à fusionner
     sdd_dt %>.%
-      dplyr::select(., user_name, data, date, event) -> df_tuto_label
+      dplyr::select(., user_name, data_conv, date, event) -> df_tuto_label
 
     # Fusion
     df_join <- merge(df_count, df_tuto_label , by = "user_name", all = TRUE)
@@ -220,6 +246,18 @@ function(input, output) {
                                        ),
               rownames = FALSE, filter = "top" )
   })
+
+  output$u_global_score <- renderPlot(
+    chart(ttt, fct_relevel(user_name, test) ~ quiz %fill=% score1) +
+      geom_raster() +
+      xlab("") +
+      ylab("") +
+      geom_hline(yintercept = (0:length(levels(ttt$user_name))) + 0.5) +
+      geom_vline(xintercept = (0:length(unique(ttt$name))) + 0.5) +
+      scale_fill_distiller(palette = "RdBu", direction = 1) +
+      labs(caption = "The score is the ratio of submitted responses to the total number of responses per quiz", fill = "Score") +
+      theme(plot.caption = element_text(size = 14))
+  )
 
 }
 

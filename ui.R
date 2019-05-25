@@ -6,114 +6,122 @@ SciViews::R
 
 shinyUI(
   navbarPage(
-    "Tableau de bord",
-
-    navbarMenu("Quiz",
-               tabPanel("Jordan",
-                        sidebarLayout(
-                          sidebarPanel(
-                            selectInput("tuto_lab", "Select the desired question below",
-                                        choices = unique(sdd_dt$tuto_label),
-                                        selected = unique(sdd_dt$tuto_label)[1],
-                                        selectize = F),
-                            radioButtons("ui_quiz_unit", "Unit (Subtab1) :",
-                                         choices = c("percentage (%)", "number of students"),
-                                         selected = "percentage (%)")
-                          ),
-                          mainPanel(
-                            tabsetPanel(
-
-                              tabPanel("Subtab1",
-                                       plotlyOutput("plot1"),
-                                       br(),
-                                       DTOutput(outputId = "u_quiz_table1")
-                                       ),
-
-                              tabPanel("Subtab2",
-                                       DTOutput(outputId = "u_quiz_table2")
-                                       )
-                            )
-                          )
-                        )),
-
-               tabPanel("Guyliann",
-                        sidebarLayout(
-                          sidebarPanel(
-                            selectInput("tuto", "Sélectionnez le quiz souhaité ci-dessous",
-                                        choices = unique(sdd_dt$tutorial),
-                                        selected = unique(sdd_dt$tutorial)[2],
-                                        selectize = F),
-                            strong("Cette application web est en cours de développement")),
-                          mainPanel(
-                            title = "Plot 1",
-                            plotOutput("bar_plot_quiz"))
-                        )
-               )
-
-
-    ),
-
-    tabPanel("Description générale",
+    "Dashboard",
+    tabPanel("General description",
              sidebarLayout(
                sidebarPanel(
                  imageOutput("econum")
-                 ),
+               ),
                mainPanel(
-                 h4("Description du tableau de données"),
+                 h4("Description of database"),
                  textOutput("nbr"),
                  tableOutput("tab_gen"),
                  textOutput("tuto_nbr"),
                  DTOutput("tab_mod"),
                  hr(),
-                 strong("Cette application est en cours de développement
-                        au sein du service d'écologie numérique des milieux
-                        aquatiques de l'Université de Mons
-                        dans le cadre des cours de sciences des données"),
                  imageOutput("bds")
-               )
+                 )
                )),
-    tabPanel("Vue globale",
+    tabPanel("Global view",
              sidebarLayout(
                sidebarPanel(
-                 radioButtons("nb_tuto", "Sélectionnez la représentation graphique
-                             souhaitée ci-dessous",
-                             choices = c("Entrées en fonction du temps",
-                                         "Nombre total d'essais par quiz",
-                                         "Nombre d'essais standardisés",
-                                         "Score de participation par étudiants"),
-                             selected = "Entrées en fonction du temps"),
-                 strong("Cette application web est en cours de développement")
+                 radioButtons("nb_tuto", "Select the desired graphic representation below",
+                              choices = c("Submission by time",
+                                          "Total number of attempts per quiz",
+                                          "Number of standardized attempts"),
+                              selected = "Submission by time")
                  ),
                mainPanel(
                  plotOutput("bar_plot"),
                  hr(),
-                 p("Après avoir analysé les différents graphiques mis à votre
-                   disposition vous avez pu mettre en évidence des tutoriels
-                   ayant pu poser problème aux étudiants. Vous avez à votre
-                   disposition les onglets suivants (Quiz, Etudiants)
-                   afin de poursuivre votre analyse.")
+                 p("After analyzing the different graphs available to you, you were able to highlight tutorials that may have caused problems for students. You have at your disposal the following tabs (Quiz, Students to continue your analysis.")
                  )
                  )
-             ),
+                 ),
+    navbarMenu("Quiz",
+               tabPanel("Global Score",
+                        sidebarLayout(
+                          sidebarPanel(),
+                          mainPanel(
+                            plotOutput("u_global_score")
+                          )
+                        )
+                        ),
+               tabPanel("Jordan",
+                        tabsetPanel(
+                          tabPanel("Attempt",
+                                   sidebarLayout(
+                                     sidebarPanel(
+                                       selectInput("tuto_lab", "Select the desired questionnaire below",
+                                                   choices = unique(sdd_dt$tuto_label),
+                                                   selected = unique(sdd_dt$tuto_label)[1],
+                                                   selectize = F),
+                                       radioButtons("ui_quiz_unit", "Unit :",
+                                                    choices = c("percentage (%)", "number of students"),
+                                                    selected = "percentage (%)")
+                                     ),
+                                     mainPanel(
+                                       plotlyOutput("plot1"),
+                                       br(),
+                                       DTOutput(outputId = "u_quiz_table1"),
+                                       br()
 
-
-        tabPanel("Etudiants",
+                                     )
+                                   )
+                          ),
+                          tabPanel("Answer",
+                                   sidebarLayout(
+                                     sidebarPanel(
+                                       uiOutput("ui_tuto_lab")
+                                     ),
+                                     mainPanel(
+                                       tabPanel("Subtab2",
+                                                DTOutput(outputId = "u_quiz_table2")
+                                       ))
+                                   )
+                          )
+                        )
+               ),
+               tabPanel("Guyliann",
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("tuto", "Select the desired quiz below",
+                                        choices = unique(sdd_dt$tutorial),
+                                        selected = unique(sdd_dt$tutorial)[2],
+                                        selectize = F)
+                            ),
+                          mainPanel(
+                            title = "Plot 1",
+                            plotOutput("bar_plot_quiz"))
+                        )
+               )
+    ),
+    tabPanel("Students",
              sidebarLayout(
                sidebarPanel(
-                 selectInput("stu", "Sélectionnez le participant souhaité ci-dessous",
-                             choices = unique(sdd_dt$user_name),
-                             selected = unique(sdd_dt$user_name)[1],
+                 selectInput("stu", "Select the desired participant below",
+                             choices = unique(sort(sdd_dt$user_name)),
+                             selected = unique(sort(sdd_dt$user_name))[1],
                              selectize = F),
-                 selectInput("tuto1", "Sélectionnez le quiz souhaité ci-dessous",
+                 selectInput("tuto1", "Select the desired quizz below",
                              choices = unique(sdd_dt$tutorial),
                              selected = unique(sdd_dt$tutorial)[2],
-                             selectize=FALSE),
-                 strong("Cette application web est en cours de développement")),
+                             selectize = FALSE)
+                 ),
                mainPanel(
-                 plotOutput("bar_plot_stu"),
-                 plotOutput("bar_plot_stu1")
+                 tabsetPanel(
+                   tabPanel("Subtab1",
+                            plotOutput("bar_plot_stu"),
+                            br(),
+                            plotlyOutput("plot3"),
+                            br()
+                   ),
+
+                   tabPanel("Subtab2",
+                            plotOutput("bar_plot_stu1")
+                   )
+                 )
                )
              )
-             )#,
-    #inverse = TRUE
-))
+    )
+                 ))
