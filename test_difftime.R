@@ -92,7 +92,7 @@ sdd_dt %>.%
   dplyr::arrange(., date) %>.%
   group_by(., user_name, tutorial) %>.%
   dplyr::mutate(., diff = difftime(date, date[1], units = "mins"))  %>.%
-  dplyr::filter(., diff < 20) %>.%
+  dplyr::filter(., diff < 120) %>.%
   dplyr::mutate(., diff = round(diff, digits = 2)) %>.%
   dplyr::mutate(., max_diff = max(diff)) %>.%
   dplyr::select(., tutorial, user_name, max_diff) -> df
@@ -114,16 +114,20 @@ df$mean_overall <- round(df$mean_overall, digits = 2)
 text1 <- paste("Tutorial : ", df$tutorial, "\nTime :", df$max_diff, " min", sep = "")
 text2 <- paste("Tutorial : ", df$tutorial, "\nTime :", df$mean_overall, " min", sep = "")
 
+
+
 plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = "student",
-        text = text1,hoverinfo = "text", marker = list(line = list(color = "rgb(8,48,107)",
+        text = text1,hoverinfo = "text+name", hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),marker = list(line = list(color = "rgb(8,48,107)",
                                   width = 1.5))) %>%
-  add_trace(y = ~mean_overall, name = "average", text = text2) %>%
+
+
+  add_trace(y = ~mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
   layout(., showlegend = TRUE,
-       xaxis = list(title = "Tutorial"),
-       yaxis = list(title = "Time (min)")) %>.%
+       xaxis = list(title = ""),
+       yaxis = list(title = "Time [min]")) %>.%
   config(., displayModeBar = F) -> p
 
-
+p
 
 
 df %>.%

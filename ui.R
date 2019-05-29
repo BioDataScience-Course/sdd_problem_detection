@@ -97,31 +97,36 @@ shinyUI(
                )
     ),
     tabPanel("Students",
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput("stu", "Select the desired participant below",
-                             choices = unique(sort(sdd_dt$user_name)),
-                             selected = unique(sort(sdd_dt$user_name))[1],
-                             selectize = F),
-                 selectInput("tuto1", "Select the desired quizz below",
-                             choices = unique(sdd_dt$tutorial),
-                             selected = unique(sdd_dt$tutorial)[2],
-                             selectize = FALSE)
-                 ),
-               mainPanel(
-                 tabsetPanel(
-                   tabPanel("Subtab1",
-                            plotOutput("bar_plot_stu"),
-                            br(),
-                            plotlyOutput("plot3"),
-                            br()
+             tabsetPanel(
+               tabPanel(
+                 "Test",
+                 sidebarLayout(
+                   sidebarPanel(
+                     selectInput("stu", "Select the desired participant below",
+                                 choices = unique(sort(sdd_dt$user_name)),
+                                 selected = unique(sort(sdd_dt$user_name))[1],
+                                 selectize = F)
                    ),
-
-                   tabPanel("Subtab2",
-                            plotOutput("bar_plot_stu1")
+                   mainPanel(
+                     plotOutput("bar_plot_stu"),
+                     br(),
+                     plotlyOutput("plot3"),
+                     br()
+                   )
+                 )
+               ),
+               tabPanel(
+                 "Test2",
+                 sidebarLayout(
+                   sidebarPanel(
+                     uiOutput("u_stu_name")
+                   ),
+                   mainPanel(
+                     plotOutput("bar_plot_stu1")
                    )
                  )
                )
              )
+
     )
                  ))

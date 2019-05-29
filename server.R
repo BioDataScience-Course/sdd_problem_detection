@@ -54,7 +54,7 @@ function(input, output) {
       chart::chart(data = sdd_dt, ~ fct_relevel(tutorial, ord) %fill=% tutorial) +
         geom_bar(show.legend = F) +
         coord_flip() +
-        labs(x = "Quiz", y = "Number of attempt",
+        labs(x = "Quiz", y = "Number of attempts",
              caption = "Number of attempts per quiz") +
         theme( plot.caption = element_text(size = 14))
     } else if (input$nb_tuto == "Number of standardized attempts") {
@@ -66,7 +66,7 @@ function(input, output) {
         geom_col(show.legend = F) +
         coord_flip() +
         labs(x = "Quiz", y = "Number of standardized",
-             caption = "Number of attempt standardized by the number of questions per quiz") +
+             caption = "Number of attempts standardized by the number of questions per quiz") +
         theme(plot.caption = element_text(size = 14))
     }
   })
@@ -131,7 +131,7 @@ function(input, output) {
                    type = "bar", text = info_tooltip,
                    hoverinfo = "text") %>.%
         layout(., showlegend = FALSE,
-                  xaxis = list(title = "Attempt"),
+                  xaxis = list(title = "Number of attempts"),
                   yaxis = list(title = y_axis_name)) %>.%
         config(., displayModeBar = F)
   })
@@ -143,7 +143,7 @@ function(input, output) {
       dplyr::arrange(., date) %>.%
       group_by(., user_name, tutorial) %>.%
       dplyr::mutate(., diff = difftime(date, date[1], units = "mins"))  %>.%
-      dplyr::filter(., diff < 20) %>.%
+      dplyr::filter(., diff < 120) %>.%
       dplyr::mutate(., diff = round(diff, digits = 2)) %>.%
       dplyr::mutate(., max_diff = max(diff)) %>.%
       dplyr::select(., tutorial, user_name, max_diff) -> df
@@ -166,12 +166,14 @@ function(input, output) {
     text2 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$mean_overall, " min", sep = "")
 
     plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = "student",
-            text = text1, hoverinfo = "text+name", marker = list(line = list(color = "rgb(8,48,107)",
-                                                                       width = 1.5))) %>%
-      add_trace(y = ~mean_overall, name = "average", text = text2) %>%
+            text = text1,
+            hoverinfo = "text+name",
+            hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
+            marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>%
+      add_trace(y = ~mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
       layout(., title = input$stu, showlegend = TRUE,
-             xaxis = list(title = "Tutorial"),
-             yaxis = list(title = "Time (min)")) %>.%
+             xaxis = list(title = ""),
+             yaxis = list(title = "Time [min]")) %>.%
       config(., displayModeBar = F)
 
   })
@@ -258,6 +260,14 @@ function(input, output) {
       labs(caption = "The score is the ratio of submitted responses to the total number of responses per quiz", fill = "Score") +
       theme(plot.caption = element_text(size = 14))
   )
+
+  output$u_stu_name <- renderUI({
+    student_name <- input$stu
+    selectInput("tuto1", paste("Select the desired quizz below.\n Student selected", student_name, sep = " : "),
+                choices = unique(sdd_dt$tutorial),
+                selected = unique(sdd_dt$tutorial)[2],
+                selectize = FALSE)
+  })
 
 }
 
