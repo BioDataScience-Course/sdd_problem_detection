@@ -88,6 +88,7 @@ ggplotly(p)
 #=============================================
 
 sdd_dt %>.%
+
   dplyr::select(., date, user_name, tutorial) %>.%
   dplyr::arrange(., date) %>.%
   group_by(., user_name, tutorial) %>.%
