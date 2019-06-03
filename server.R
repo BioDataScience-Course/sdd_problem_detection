@@ -11,7 +11,7 @@ function(input, output) {
 
   output$tab_gen <- renderTable({
     tibble::data_frame("Submission" = nrow(sdd_dt),
-               "Quiz" = length(unique(sdd_dt$tutorial)),
+               "Questionnaire" = length(unique(sdd_dt$tutorial)),
                "Students" = length(unique(sdd_dt$user_name)))
   })
 
@@ -37,24 +37,24 @@ function(input, output) {
 
   output$tab_mod <- renderDataTable({
     datatable(table_nbr_question,
-              colnames = c("Quiz", "Students", "Number of submission",
-                           "Number of question per quiz"),
+              colnames = c("Questionnaire", "Students", "Number of submission",
+                           "Number of exercice per questionnaire"),
               rownames = FALSE, options = list(dom = "ltip", pageLength = 5))
       })
 
   output$u_caption_bar_plot <- renderText({
     if (input$nb_tuto == "Submission by time") {
-    "Succession of input density graphs over time by quiz"
+    "Succession of input density graphs over time by questionnaire"
     }
 
     else if (input$nb_tuto == "Number of standardized attempts") {
-      "Number of attempts standardized by the number of questions per quiz"
+      "Number of attempts standardized by the number of exercices per questionnaire"
     }
 
   })
 
   output$u_caption_global_score <- renderText({
-    "The score is the ratio of submitted responses to the total number of responses per quiz"
+    "The score is the ratio of submitted responses to the total number of responses per questionnaire"
   })
 
 
@@ -63,7 +63,7 @@ function(input, output) {
       chart::chart(data = sdd_dt,
                    fct_relevel(tutorial, ord) ~ date %fill=% tutorial) +
         ggridges::geom_density_ridges(show.legend = F) +
-        labs( x = "Time [month]", y = "Quiz") +
+        labs( x = "Time [month]", y = "Questionnaire") +
         theme( plot.caption = element_text(size = 14))
     } else if (input$nb_tuto == "Number of standardized attempts") {
       sdd_dt %>.%
@@ -73,7 +73,7 @@ function(input, output) {
         chart::chart(data = ., ratio ~ fct_relevel(tutorial, ord) %fill=% tutorial) +
         geom_col(show.legend = F) +
         coord_flip() +
-        labs(x = "Quiz", y = "Number of standardized") +
+        labs(x = "Questionnaire", y = "Number of standardized") +
         theme(plot.caption = element_text(size = 14))
     }
   })
@@ -88,24 +88,14 @@ function(input, output) {
 
       # Personnalisation graphique
 
-      labs(x = "Time [month]", y = "Quiz") +
+      labs(x = "Time [month]", y = "Questionnaire") +
       theme(panel.background = element_rect(fill = "white", colour = "white"))+
       theme(axis.title.x = element_text(family = "Open Sans", face = "plain", colour = "black", size = "20")) +
       theme(axis.title.y = element_text(family = "Open Sans", face = "plain", colour = "black", size = "20"))
 
   })
 
-  output$bar_plot_stu1 <- renderPlot({
-    sdd_dt %>.%
-      filter(., user_name == input$stu) %>.%
-      filter(., tutorial == input$tuto1) %>.%
-      chart::chart(., ~ label %fill=% event) +
-      ggplot2::geom_bar() +
-      ggplot2::labs( x = "Questions", y = "Number of attempts",
-                     fill = "Events") +
-      ggplot2::coord_flip() +
-      theme(legend.position = "top")
-  })
+
 
 # Toutes les questions par questionnaire
   output$bar_plot_stu2 <- renderPlotly({
@@ -135,16 +125,16 @@ function(input, output) {
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
-    text1 <- paste("Quiz : ", df$tuto_label, "\nTime : ", df$max_diff, " min", sep = "")
-    text2 <- paste("Quiz : ", df$tuto_label, "\nTime : ", df$mean_overall, " min", sep = "")
+    text1 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$max_diff, " min", sep = "")
+    text2 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$mean_overall, " min", sep = "")
 
-    plot_ly(data = df, x = ~tuto_label, y = ~max_diff, type = "bar", name = "student",
+    plot_ly(data = df, x = ~tuto_label, y = ~max_diff, type = "bar", name = input$u_selectinput_student_stu2,
             text = text1,
             hoverinfo = "text+name",
             hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
             marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>%
       add_trace(y = ~mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
-      layout(., title = paste("Question from : ", input$u_selectinput_tuto_stu2, sep = ""), showlegend = TRUE,
+      layout(., title = "", showlegend = TRUE,
              xaxis = list(title = ""),
              yaxis = list(title = "Time [min]")) %>.%
       config(., displayModeBar = F)
@@ -395,7 +385,7 @@ function(input, output) {
   output$u_selected_tutorial <- renderText({
     tutorial_selected <- input$tuto_lab
 
-    paste("<b>Question selected : </b> ", tutorial_selected, sep = "<br>")
+    paste("<b>Exercice selected : </b> ", tutorial_selected, sep = "<br>")
 
   })
 }
