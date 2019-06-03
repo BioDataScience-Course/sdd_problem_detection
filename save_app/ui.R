@@ -27,6 +27,7 @@ shinyUI(
                sidebarPanel(width = 3,
                  radioButtons("nb_tuto", "Select the desired graphic representation below",
                               choices = c("Submission by time",
+                                          "Total number of attempts per quiz",
                                           "Number of standardized attempts"),
                               selected = "Submission by time")
                  ),
@@ -42,12 +43,11 @@ shinyUI(
                         sidebarLayout(
                           sidebarPanel(width = NULL),
                           mainPanel(width = 12,
-                            plotOutput("u_global_score"),
-                            verbatimTextOutput("u_caption_global_score")
+                            plotOutput("u_global_score")
                           )
                         )
                         ),
-               tabPanel("Number of attempts",
+               tabPanel("Jordan",
                         tabsetPanel(
                           tabPanel("Attempt",
                                    sidebarLayout(
@@ -77,12 +77,25 @@ shinyUI(
                                    )
                           )
                         )
+               ),
+               tabPanel("Guyliann",
+                        sidebarLayout(
+                          sidebarPanel(width = 2,
+                            selectInput("tuto", "Select the desired quiz below",
+                                        choices = unique(sdd_dt$tutorial),
+                                        selected = unique(sdd_dt$tutorial)[2],
+                                        selectize = F)
+                            ),
+                          mainPanel(width = 10,
+                            title = "Plot 1",
+                            plotOutput("bar_plot_quiz"))
+                        )
                )
     ),
     tabPanel("Students",
-      tabsetPanel(type = "pills",
+             tabsetPanel(type = "pills",
                tabPanel(
-                 title = "Global View by tutorial(Test1)",
+                 title = "Test",
                  sidebarLayout(
                    sidebarPanel(width = 2,
                      selectInput("stu", "Select the desired participant below",
@@ -102,7 +115,7 @@ shinyUI(
                  )
                ),
                tabPanel(
-                 "View by student and quiz(Test2)",
+                 "Test2",
                  sidebarLayout(
                    sidebarPanel(width = 2,
                      htmlOutput("u_stu_name"),
@@ -116,31 +129,29 @@ shinyUI(
                      plotOutput("bar_plot_stu1")
                    )
                  )
-               ),
-               tabPanel(
-                 "Time by student (Test3)",
-                 sidebarLayout(
-                   sidebarPanel(
-                     selectInput("u_selectinput_student_stu2", "Select the desired student below",
-                                 choices = unique(sort(sdd_dt$user_name)),
-                                 selected = unique(sort(sdd_dt$user_name))[1],
-                                 selectize = F),
-                     selectInput("u_selectinput_tuto_stu2", "Select the desired tutorial below",
-                                 choices = unique(sort(sdd_dt$tutorial)),
-                                 selected = unique(sort(sdd_dt$tutorial))[1])
-                     #uiOutput("u_selectinput_quiz_stu2"),
-
-                   ),
-                   mainPanel(
-                     plotlyOutput("bar_plot_stu2.2"),
-                     plotlyOutput("bar_plot_stu2")
-
-
-                   )
-                 )
                )
+
              )
 
-    )
+    ),
+    tabPanel(
+      "Test3",
+      sidebarLayout(
+        sidebarPanel(
+          selectInput("u_selectinput_tuto_stu2", "Select the desired tutorial below",
+                      choices = unique(sort(sdd_dt$tutorial)),
+                      selected = unique(sort(sdd_dt$tutorial))[1]),
+          #uiOutput("u_selectinput_quiz_stu2"),
+          selectInput("u_selectinput_student_stu2", "Select the desired student below",
+                      choices = unique(sort(sdd_dt$user_name)),
+                      selected = unique(sort(sdd_dt$user_name))[1],
+                      selectize = F)
+        ),
+        mainPanel(
+          plotOutput("bar_plot_stu2"),
+          plotOutput("bar_plot_stu2.2")
 
+        )
+      )
+    )
                  ))
