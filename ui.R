@@ -35,8 +35,8 @@ shinyUI(
                  verbatimTextOutput("u_globalview_caption"),
                  hr()
                  )
-                 )
-                 ),
+               )
+      ),
     navbarMenu("Questionnaire",
                tabPanel("Global Score",
                         sidebarLayout(
@@ -46,16 +46,16 @@ shinyUI(
                             verbatimTextOutput("u_globalscore_caption")
                           )
                         )
-                        ),
+                 ),
                tabPanel("Number of attempts",
+                 selectInput("u_numberofattempts_selectinput", "Select the desired exercice below",
+                 choices = unique(sdd_dt$tuto_label),
+                 selected = unique(sdd_dt$tuto_label)[1],
+                 selectize = F),
                         tabsetPanel(
                           tabPanel("Attempt",
                                    sidebarLayout(
                                      sidebarPanel(width = 2,
-                                       selectInput("u_numberofattempts_selectinput", "Select the desired exercice below",
-                                                   choices = unique(sdd_dt$tuto_label),
-                                                   selected = unique(sdd_dt$tuto_label)[1],
-                                                   selectize = F),
                                        radioButtons("u_numberofattempts_radio", "Unit :",
                                                     choices = c("percentage (%)", "number of students"),
                                                     selected = "percentage (%)")
@@ -70,13 +70,12 @@ shinyUI(
                           ),
                           tabPanel("Answer",
                                    sidebarLayout(
-                                     sidebarPanel(width = 2,
-                                                  htmlOutput("u_numberofattempts_selected")),
+                                     sidebarPanel(width = 2, "INSERT TEXT"),
                                      mainPanel(width = 10, DTOutput(outputId = "u_numberofattempts_datatable2.1"))
                                    )
+                            )
                           )
-                        )
-               )
+                 )
     ),
     tabPanel("Students",
       tabsetPanel(type = "pills",
@@ -91,9 +90,6 @@ shinyUI(
                    ),
                    mainPanel(width = 10,
                      plotOutput("u_students_plotly1.1"),
-                     br(),
-                     br(),
-                     br(),
                      plotlyOutput("u_students_plotly1.2"),
                      plotlyOutput("u_students_plotly1.3"),
                      br()
@@ -112,18 +108,14 @@ shinyUI(
                                  choices = unique(sort(sdd_dt$tutorial)),
                                  selected = unique(sort(sdd_dt$tutorial))[1])
                      #uiOutput("u_selectinput_quiz_stu2"),
-
                    ),
                    mainPanel(width = 10,
                      plotlyOutput("u_students_plotly2.1"),
                      plotlyOutput("u_students_plotly2.2")
-
-
                    )
                  )
                )
              )
-
+      )
     )
-
-                 ))
+  )

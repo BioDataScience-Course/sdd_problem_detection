@@ -161,12 +161,6 @@ function(input, output) {
 
   ### Sous-sous onglet Answer
 
-  output$u_numberofattempts_selected <- renderText({
-    tutorial_selected <- input$u_numberofattempts_selectinput
-
-    paste("<b>Exercice selected : </b> ", tutorial_selected, sep = "<br>")
-  })
-
   output$u_numberofattempts_datatable2.1 <- renderDT({
     filter(sdd_dt, tuto_label == input$u_numberofattempts_selectinput) -> sdd_dt
 
