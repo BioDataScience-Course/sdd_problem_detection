@@ -40,7 +40,7 @@ shinyUI(
     navbarMenu("Questionnaire",
                tabPanel("Global Score",
                         sidebarLayout(
-                          sidebarPanel(width = 2, "INSERT TEXT"),
+                          sidebarPanel(width = 2, "INSERT TEXT1"),
                           mainPanel(width = 10,
                             plotOutput("u_globalscore_plot", height = "900px"),
                             verbatimTextOutput("u_globalscore_caption")
@@ -61,7 +61,7 @@ shinyUI(
                                                     selected = "percentage (%)")
                                      ),
                                      mainPanel(width = 10,
-                                       plotlyOutput("u_numberofattempts_plotly", height = "500px"),
+                                       plotlyOutput("u_numberofattempts_plotly", height = "450px"),
                                        br(),
                                        DTOutput(outputId = "u_numberofattempts_datatable1.1"),
                                        br()
@@ -70,7 +70,8 @@ shinyUI(
                           ),
                           tabPanel("Answer",
                                    sidebarLayout(
-                                     sidebarPanel(width = 2, "INSERT TEXT"),
+                                     sidebarPanel(width = 2,
+                                       "INSERT TEXT2"),
                                      mainPanel(width = 10, DTOutput(outputId = "u_numberofattempts_datatable2.1"))
                                    )
                             )
@@ -78,18 +79,17 @@ shinyUI(
                  )
     ),
     tabPanel("Students",
-      tabsetPanel(type = "pills",
+      selectInput("u_students_selectinput1", "Select the desired student below",
+      choices = unique(sort(sdd_dt$user_name)),
+      selected = unique(sort(sdd_dt$user_name))[1],
+      selectize = F),
+      tabsetPanel(
                tabPanel(
                  title = "Global View by questionnaire",
                  sidebarLayout(
-                   sidebarPanel(width = 2,
-                     selectInput("u_students_selectinput1.1", "Select the desired participant below",
-                                 choices = unique(sort(sdd_dt$user_name)),
-                                 selected = unique(sort(sdd_dt$user_name))[1],
-                                 selectize = F)
-                   ),
+                   sidebarPanel(width = 2, "INSERT TEXT3"),
                    mainPanel(width = 10,
-                     plotOutput("u_students_plotly1.1"),
+                     plotOutput("u_students_plot1.1"),
                      plotlyOutput("u_students_plotly1.2"),
                      plotlyOutput("u_students_plotly1.3"),
                      br()
@@ -100,14 +100,9 @@ shinyUI(
                  "Time by student",
                  sidebarLayout(
                    sidebarPanel(width = 2,
-                     selectInput("u_students_selectinput2.1", "Select the desired student below",
-                                 choices = unique(sort(sdd_dt$user_name)),
-                                 selected = unique(sort(sdd_dt$user_name))[1],
-                                 selectize = F),
-                     selectInput("u_students_selectinput2.2", "Select the desired questionnaire below",
+                     selectInput("u_students_selectinput2.1", "Select the desired questionnaire below",
                                  choices = unique(sort(sdd_dt$tutorial)),
                                  selected = unique(sort(sdd_dt$tutorial))[1])
-                     #uiOutput("u_selectinput_quiz_stu2"),
                    ),
                    mainPanel(width = 10,
                      plotlyOutput("u_students_plotly2.1"),

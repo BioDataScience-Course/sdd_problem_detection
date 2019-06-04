@@ -195,9 +195,9 @@ function(input, output) {
   # ONGLET : Students
   ## SOUS-ONGLET : Global View by questionnaire
 
-  output$u_students_plotly1.1 <- renderPlot({
+  output$u_students_plot1.1 <- renderPlot({
     sdd_dt %>.%
-      filter(., user_name == input$u_students_selectinput1.1) %>.%
+      filter(., user_name == input$u_students_selectinput1) %>.%
       ggplot(., aes(x = date, y = fct_relevel(tutorial, ord), fill = tutorial )) +
       ggridges::geom_density_ridges(show.legend = F) +
 
@@ -229,14 +229,14 @@ function(input, output) {
     plyr::ddply(df, .(tutorial), summarize, mean_overall = mean(max_diff)) -> df_mean
 
     merge(df, df_mean,  by =  "tutorial", all.y = TRUE) %>.%
-      dplyr::filter(., user_name == input$u_students_selectinput1.1) -> df
+      dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
     text1 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$max_diff, " min", sep = "")
     text2 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$mean_overall, " min", sep = "")
 
-    plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = input$u_students_selectinput1.1,
+    plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = input$u_students_selectinput1,
       text = text1,
       hoverinfo = "text+name",
       hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
@@ -258,7 +258,7 @@ function(input, output) {
     plyr::ddply(df, .(tutorial), summarize, mean_overall = mean(count)) -> df_mean
 
     merge(df, df_mean,  by =  "tutorial", all.y = TRUE) %>.%
-      dplyr::filter(., user_name == input$u_students_selectinput1.1) -> df
+      dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
@@ -266,7 +266,7 @@ function(input, output) {
     text2 <- paste("Tutorial : ", df$tutorial, "\nAttempts : ", df$mean_overall, sep = "")
 
     plot_ly(data = df, x = df$tutorial, y = df$count,
-      type = "bar", text = text1, name = input$u_students_selectinput1.1,
+      type = "bar", text = text1, name = input$u_students_selectinput1,
       hoverinfo = "text+name",
       hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
       marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>.%
@@ -282,7 +282,7 @@ function(input, output) {
   output$u_students_plotly2.1 <- renderPlotly({
 
     sdd_dt %>.%
-      dplyr::filter(., tutorial == input$u_students_selectinput2.2) %>.%
+      dplyr::filter(., tutorial == input$u_students_selectinput2.1) %>.%
       dplyr::select(., user_name, tuto_label) %>.%
       group_by(., user_name, tuto_label) %>.%
       summarise(., count = n() ) %>.%
@@ -291,7 +291,7 @@ function(input, output) {
     plyr::ddply(df, .(tuto_label), summarize, mean_overall = mean(count)) -> df_mean
 
     merge(df, df_mean,  by =  "tuto_label", all.y = TRUE) %>.%
-      dplyr::filter(., user_name == input$u_students_selectinput2.1) -> df
+      dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
@@ -299,7 +299,7 @@ function(input, output) {
     text2 <- paste("Exercices : ", df$tuto_label, "\nAttempts : ", df$mean_overall, sep = "")
 
     plot_ly(data = df, x = df$tuto_label, y = df$count,
-      type = "bar", text = text1, name = input$u_students_selectinput2.1,
+      type = "bar", text = text1, name = input$u_students_selectinput1,
       hoverinfo = "text+name",
       hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
       marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>.%
@@ -312,7 +312,7 @@ function(input, output) {
 
   output$u_students_plotly2.2 <- renderPlotly({
       sdd_dt %>.%
-      dplyr::filter(., tutorial == input$u_students_selectinput2.2) %>.%
+      dplyr::filter(., tutorial == input$u_students_selectinput2.1) %>.%
       dplyr::select(., date, user_name, tuto_label) %>.%
       dplyr::arrange(., date) %>.%
       group_by(., user_name, tuto_label) %>.%
@@ -332,14 +332,14 @@ function(input, output) {
     plyr::ddply(df, .(tuto_label), summarize, mean_overall = mean(max_diff)) -> df_mean
 
     merge(df, df_mean,  by =  "tuto_label", all.y = TRUE) %>.%
-      dplyr::filter(., user_name == input$u_students_selectinput2.1) -> df
+      dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
     text1 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$max_diff, " min", sep = "")
     text2 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$mean_overall, " min", sep = "")
 
-    plot_ly(data = df, x = ~tuto_label, y = ~max_diff, type = "bar", name = input$u_students_selectinput2.1,
+    plot_ly(data = df, x = ~tuto_label, y = ~max_diff, type = "bar", name = input$u_students_selectinput1,
             text = text1,
             hoverinfo = "text+name",
             hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
