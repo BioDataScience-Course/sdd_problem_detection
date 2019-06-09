@@ -13,6 +13,7 @@ library(lubridate)
 
 SciViews::R
 
+
 # Import dataset -----------
 sdd_dt <- read_rds("data/sdd_wrangling.rds")
 
@@ -25,7 +26,10 @@ sdd_dt %>.%
   filter(., label != "comm") %>.%
   group_by(., name) %>.%
   summarise(., student = length(unique(user_name)),
-            entree = length(tuto_label), tot = length(unique(tuto_label))) -> table_nbr_question
+            entree = length(tuto_label),
+    tot = length(unique(tuto_label))) -> table_nbr_question
+
+levels(sdd_dt$event)<- c("open question","comm", "video", "quiz")
 
 sdd_dt1 <- filter(sdd_dt, ! is.na(correct))
 sdd_dt1 <- filter(sdd_dt1, label != "comm")
@@ -44,7 +48,10 @@ ttt <- mutate(ttt, score = res/tot,
 
 test <- rev(paste("student_", 1:40, sep = ""))
 
-plotlyridges=function(data,vardens,varcat,linecolor='darkblue',fillcolor='steelblue',fillopacity=0.6,linewidth=0.5,scale=0.9,logspaced=FALSE,cut.from=0, cut.to=3,n=512,bw=NULL,bw.separate=FALSE,height.norm='integral',round.digits=2,x.min=0
+plotlyridges=function(data,vardens,varcat,linecolor='darkblue',
+  fillcolor='steelblue',fillopacity=0.6,linewidth=0.5,scale=0.9,
+  logspaced=FALSE,cut.from=0, cut.to=3,n=512,bw=NULL,
+  bw.separate=FALSE,height.norm='integral',round.digits=2,x.min=0
                       ,height=NULL
                       ,width=NULL
 ){
@@ -68,7 +75,8 @@ plotlyridges=function(data,vardens,varcat,linecolor='darkblue',fillcolor='steelb
     }
   }
 
-  df=aggregate(data[,vardens],by=list(varcat=data[,varcat]),FUN=function(x){
+  df=aggregate(data[,vardens],
+    by=list(varcat=data[,varcat]),FUN=function(x){
 
     if(length(x)==0) return(NULL)
     if(bw.separate){
@@ -101,11 +109,17 @@ plotlyridges=function(data,vardens,varcat,linecolor='darkblue',fillcolor='steelb
     return(d)
   })
 
-  text=aggregate(data[,vardens],by=list(varcat=data[,varcat]),FUN=function(x){
+  text=aggregate(data[,vardens],by=list(varcat=data[,varcat]),
+    FUN=function(x){
 
     x=x[!is.na(x)]
     q=quantile(x)
-    text=paste0('Observations: ',prettyNum(length(x),big.mark=','),'<br>Median: ',round(q[3],round.digits),'<br>Range: [',round(q[1],round.digits),', ',round(q[5],round.digits),']','<br>Interquartile Range: [',round(q[2],round.digits),', ',round(q[4],round.digits),']')
+    text=paste0('Observations: ',prettyNum(length(x),big.mark=','),
+      '<br>Median: ',round(q[3],round.digits),
+      '<br>Range: [',round(q[1],round.digits),
+      ', ',round(q[5],round.digits),']',
+      '<br>Interquartile Range: [',round(q[2],round.digits),', '
+      ,round(q[4],round.digits),']')
     return(text)
   })$x
 
@@ -137,13 +151,20 @@ plotlyridges=function(data,vardens,varcat,linecolor='darkblue',fillcolor='steelb
 
   for(i in rev(1:length(catnames))){
 
-    p=plotly::add_trace(p,x=x[[i]],y=i, line=list(color=linecolor,width=linewidth),showlegend=FALSE,hoverinfo='none')
+    p=plotly::add_trace(p,x=x[[i]],y=i,
+      line=list(color=linecolor,width=linewidth),
+      showlegend=FALSE,hoverinfo='none')
     p=plotly::add_trace(p,
-                        x=x[[i]],y=y[[i]]+i,fill='tonexty', fillcolor=fillcolor, line=list(color=linecolor,width=linewidth),showlegend=FALSE, name=catnames[i],hoverinfo='text',text=text[i]
+                        x=x[[i]],y=y[[i]]+i,fill='tonexty',
+      fillcolor=fillcolor, line=list(color=linecolor,
+        width=linewidth),showlegend=FALSE, name=catnames[i],
+      hoverinfo='text',text=text[i]
     )
 
     p=plotly::layout(p,
-                     yaxis=list(tickmode='array',tickvals=(1:length(catnames)),ticktext=catnames,showline=TRUE)
+                     yaxis=list(tickmode='array',
+                       tickvals=(1:length(catnames)),
+                       ticktext=catnames,showline=TRUE)
                      ,xaxis=xaxis
     )
 

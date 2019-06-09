@@ -1,11 +1,15 @@
 function(input, output) {
 
+
   # Onglet General description
 
-  output$u_generaldescription_image1 <- renderImage({
-    list(src = "images/EcoNum-logo.jpg",
-      filetype = "image/jpg")
-  }, deleteFile = FALSE)
+  output$u_generaldescription_image1 <- renderText({
+    econum <-  '<a href="https://imgbb.com/"><img src="https://i.ibb.co/rwHg3FL/econum.png" height="100%" width="100%" alt="econum" border="0"></a>'
+  })
+
+  output$u_generaldescription_image2 <- renderText({
+    bds <-  '<a href="https://imgbb.com/"><img src="https://i.ibb.co/HVLH9PW/Bio-Data-Science-256.png" alt="Bio-Data-Science-256" border="0"></a>'
+  })
 
   output$u_generaldescription_text1 <- renderText({
     paste("On this", format(Sys.time(), "%d %B %Y %X"),
@@ -76,6 +80,7 @@ function(input, output) {
     }
   })
 
+
   # Onglet Questionnaire
   ## Sous-onglet Global Score
 
@@ -86,7 +91,7 @@ function(input, output) {
       ylab("") +
       geom_hline(yintercept = (0:length(levels(ttt$user_name))) + 0.5) +
       geom_vline(xintercept = (0:length(unique(ttt$name))) + 0.5) +
-      scale_fill_distiller(palette = "RdBu", direction = 1) +
+      scale_fill_distiller(palette = "PuBu", direction = 1) +
       labs(fill = "Score") +
       theme(plot.caption = element_text(size = 14))
   )
@@ -94,6 +99,8 @@ function(input, output) {
   output$u_globalscore_caption <- renderText({
     "The score is the ratio of submitted responses to the total number of responses per questionnaire"
   })
+
+
 
   ## Sous-onglet Number of attempts
   ### Sous-sous onglet Attempts
@@ -151,13 +158,14 @@ function(input, output) {
       spread(count,user_name) %>%
       dplyr::select(-row_id) -> df_attempt
 
-    datatable(df_attempt, options = list( dom = "t",
+    datatable(df_attempt, options = list( dom = "t",pageLength = 40,
       initComplete = JS( # javascript pour modifier l'apparence
         "function(settings, json) {",
-        "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+        "$(this.api().table().header()).css({'background-color': '#005c99', 'color': '#fff'});",
         "}"
       )))
   })
+
 
   ### Sous-sous onglet Answer
 
@@ -184,7 +192,7 @@ function(input, output) {
     datatable(df_join, options = list( dom = "ltp",
       initComplete = JS(
         "function(settings, json) {",
-        "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+        "$(this.api().table().header()).css({'background-color': '#005c99', 'color': '#fff'});",
         "}"
       )
     ),
@@ -195,17 +203,27 @@ function(input, output) {
   # ONGLET : Students
   ## SOUS-ONGLET : Global View by questionnaire
 
+  output$u_students_text <- renderText({
+    paste("These graphs show how ", "<b>",
+      input$u_students_selectinput1, "</b>",
+      "answered the different questionnaires")
+  })
+
   output$u_students_plot1.1 <- renderPlot({
     sdd_dt %>.%
       filter(., user_name == input$u_students_selectinput1) %>.%
-      ggplot(., aes(x = date, y = fct_relevel(tutorial, ord), fill = tutorial )) +
+      ggplot(., aes(x = date, y = fct_relevel(tutorial, ord),
+        fill = tutorial )) +
       ggridges::geom_density_ridges(show.legend = F) +
 
       # Personnalisation graphique
       labs(x = "Time [month]", y = "Questionnaire") +
-      theme(panel.background = element_rect(fill = "white", colour = "white"))+
-      theme(axis.title.x = element_text(family = "Open Sans", face = "plain", colour = "black", size = "20")) +
-      theme(axis.title.y = element_text(family = "Open Sans", face = "plain", colour = "black", size = "20"))
+      theme(panel.background = element_rect(fill = "white",
+        colour = "white"))+
+      theme(axis.title.x = element_text(family = "Open Sans",
+        face = "plain", colour = "black", size = "20")) +
+      theme(axis.title.y = element_text(family = "Open Sans",
+        face = "plain", colour = "black", size = "20"))
   })
 
   output$u_students_plotly1.2 <- renderPlotly({
@@ -213,7 +231,8 @@ function(input, output) {
       dplyr::select(., date, user_name, tutorial) %>.%
       dplyr::arrange(., date) %>.%
       group_by(., user_name, tutorial) %>.%
-      dplyr::mutate(., diff = difftime(date, date[1], units = "mins"))  %>.%
+      dplyr::mutate(., diff = difftime(date, date[1],
+        units = "mins"))  %>.%
       dplyr::filter(., diff < 120) %>.%
       dplyr::mutate(., diff = round(diff, digits = 2)) %>.%
       dplyr::mutate(., max_diff = max(diff)) %>.%
@@ -226,22 +245,29 @@ function(input, output) {
         max_diff = x
       ) -> df
 
-    plyr::ddply(df, .(tutorial), summarize, mean_overall = mean(max_diff)) -> df_mean
+    plyr::ddply(df, .(tutorial), summarize,
+      mean_overall = mean(max_diff)) -> df_mean
 
     merge(df, df_mean,  by =  "tutorial", all.y = TRUE) %>.%
       dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
-    text1 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$max_diff, " min", sep = "")
-    text2 <- paste("Tutorial : ", df$tutorial, "\nTime : ", df$mean_overall, " min", sep = "")
+    text1 <- paste("Tutorial : ", df$tutorial, "\nTime : ",
+      df$max_diff, " min", sep = "")
+    text2 <- paste("Tutorial : ", df$tutorial, "\nTime : ",
+      df$mean_overall, " min", sep = "")
 
-    plot_ly(data = df, x = ~tutorial, y = ~max_diff, type = "bar", name = input$u_students_selectinput1,
+    plot_ly(data = df, x = ~tutorial, y = ~max_diff,
+      type = "bar", name = input$u_students_selectinput1,
       text = text1,
       hoverinfo = "text+name",
-      hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
+      hoverlabel = list(bordercolor = "white",
+        font = list(size = 18,color = "white")),
       marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>.%
-      add_trace(., y = ~mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
+      add_trace(., y = ~mean_overall, name = "average",
+        text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)",
+          font = list(size = 18,color = "black"))) %>%
       layout(., title = "", showlegend = TRUE,
         xaxis = list(title = ""),
         yaxis = list(title = "Time [min]")) %>.%
@@ -255,27 +281,35 @@ function(input, output) {
       summarise(., count = n() ) %>.%
       arrange(., tutorial) -> df
 
-    plyr::ddply(df, .(tutorial), summarize, mean_overall = mean(count)) -> df_mean
+    plyr::ddply(df, .(tutorial),
+      summarize, mean_overall = mean(count)) -> df_mean
 
     merge(df, df_mean,  by =  "tutorial", all.y = TRUE) %>.%
       dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
-    text1 <- paste("Tutorial : ", df$tutorial, "\nAttempts : ", df$count, sep = "")
-    text2 <- paste("Tutorial : ", df$tutorial, "\nAttempts : ", df$mean_overall, sep = "")
+    text1 <- paste("Tutorial : ",
+      df$tutorial, "\nAttempts : ", df$count, sep = "")
+    text2 <- paste("Tutorial : ",
+      df$tutorial, "\nAttempts : ", df$mean_overall, sep = "")
 
     plot_ly(data = df, x = df$tutorial, y = df$count,
       type = "bar", text = text1, name = input$u_students_selectinput1,
       hoverinfo = "text+name",
-      hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
+      hoverlabel = list(bordercolor = "white",
+        font = list(size = 18,color = "white")),
       marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>.%
-      add_trace(., y = df$mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
+      add_trace(., y = df$mean_overall,
+        name = "average", text = text2,
+        hoverlabel = list(bordercolor = "rgb(8,48,107)",
+          font = list(size = 18,color = "black"))) %>%
       layout(., title = "", showlegend = TRUE,
         xaxis = list(title = ""),
         yaxis = list(title = "Number of attempts")) %>.%
       config(., displayModeBar = F)
   })
+
 
   ## SOUS-ONGLET : Time by student
 
@@ -288,22 +322,29 @@ function(input, output) {
       summarise(., count = n() ) %>.%
       arrange(., tuto_label) -> df
 
-    plyr::ddply(df, .(tuto_label), summarize, mean_overall = mean(count)) -> df_mean
+    plyr::ddply(df, .(tuto_label),
+      summarize, mean_overall = mean(count)) -> df_mean
 
     merge(df, df_mean,  by =  "tuto_label", all.y = TRUE) %>.%
       dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
-    text1 <- paste("Exercices : ", df$tuto_label, "\nAttempts : ", df$count, sep = "")
-    text2 <- paste("Exercices : ", df$tuto_label, "\nAttempts : ", df$mean_overall, sep = "")
+    text1 <- paste("Exercices : ",
+      df$tuto_label, "\nAttempts : ", df$count, sep = "")
+    text2 <- paste("Exercices : ",
+      df$tuto_label, "\nAttempts : ", df$mean_overall, sep = "")
 
     plot_ly(data = df, x = df$tuto_label, y = df$count,
       type = "bar", text = text1, name = input$u_students_selectinput1,
       hoverinfo = "text+name",
-      hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
-      marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>.%
-      add_trace(., y = df$mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
+      hoverlabel = list(bordercolor = "white", font = list(size = 18,
+        color = "white")),
+      marker = list(line = list(color = "rgb(8,48,107)",
+        width = 1.5))) %>.%
+      add_trace(., y = df$mean_overall, name = "average",
+        text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)",
+          font = list(size = 18,color = "black"))) %>%
       layout(., title = "", showlegend = TRUE,
         xaxis = list(title = ""),
         yaxis = list(title = "Number of attempts")) %>.%
@@ -316,7 +357,8 @@ function(input, output) {
       dplyr::select(., date, user_name, tuto_label) %>.%
       dplyr::arrange(., date) %>.%
       group_by(., user_name, tuto_label) %>.%
-      dplyr::mutate(., diff = difftime(date, date[1], units = "mins"))  %>.%
+      dplyr::mutate(., diff = difftime(date, date[1],
+        units = "mins"))  %>.%
       dplyr::filter(., diff < 20) %>.%
       dplyr::mutate(., diff = round(diff, digits = 2)) %>.%
       dplyr::mutate(., max_diff = max(diff)) %>.%
@@ -329,22 +371,30 @@ function(input, output) {
         max_diff = x
       ) -> df
 
-    plyr::ddply(df, .(tuto_label), summarize, mean_overall = mean(max_diff)) -> df_mean
+    plyr::ddply(df, .(tuto_label), summarize,
+      mean_overall = mean(max_diff)) -> df_mean
 
     merge(df, df_mean,  by =  "tuto_label", all.y = TRUE) %>.%
       dplyr::filter(., user_name == input$u_students_selectinput1) -> df
 
     df$mean_overall <- round(df$mean_overall, digits = 2)
 
-    text1 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$max_diff, " min", sep = "")
-    text2 <- paste("Questionnaire : ", df$tuto_label, "\nTime : ", df$mean_overall, " min", sep = "")
+    text1 <- paste("Questionnaire : ",
+      df$tuto_label, "\nTime : ", df$max_diff, " min", sep = "")
+    text2 <- paste("Questionnaire : ",
+      df$tuto_label, "\nTime : ", df$mean_overall, " min", sep = "")
 
-    plot_ly(data = df, x = ~tuto_label, y = ~max_diff, type = "bar", name = input$u_students_selectinput1,
+    plot_ly(data = df, x = ~tuto_label,
+      y = ~max_diff, type = "bar", name = input$u_students_selectinput1,
             text = text1,
             hoverinfo = "text+name",
-            hoverlabel = list(bordercolor = "white", font = list(size = 18,color = "white")),
+            hoverlabel = list(bordercolor = "white",
+              font = list(size = 18,color = "white")),
             marker = list(line = list(color = "rgb(8,48,107)", width = 1.5))) %>%
-      add_trace(y = ~mean_overall, name = "average", text = text2, hoverlabel = list(bordercolor = "rgb(8,48,107)", font = list(size = 18,color = "black"))) %>%
+      add_trace(y = ~mean_overall,
+        name = "average", text = text2,
+        hoverlabel = list(bordercolor = "rgb(8,48,107)",
+          font = list(size = 18,color = "black"))) %>%
       layout(., title = "", showlegend = TRUE,
              xaxis = list(title = ""),
              yaxis = list(title = "Time [min]")) %>.%
