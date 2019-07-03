@@ -3,6 +3,10 @@ title: "Outils de détection des difficultés des étudiants dans l'utilisation 
 output: github_document
 ---
 
+<!-- badges: start -->
+[![Lifecycle: dormant](https://img.shields.io/badge/lifecycle-dormant-blue.svg)](https://www.tidyverse.org/lifecycle/#dormant)
+<!-- badges: end -->
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F,warning = F, message = F)
 SciViews::R
@@ -12,6 +16,10 @@ ord <- rev(levels(sdd_dt$tutorial))
 ```
 
 # Auteurs
+
+- [Jordan Benrezkallah](https://github.com/Jack177)
+
+# superviseur
 
 - [Guyliann Engels](https://github.com/GuyliannEngels)
 - [Philippe Grosjean](https://github.com/phgrosjean)
